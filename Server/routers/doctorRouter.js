@@ -11,9 +11,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '..', 'uploads', 'verifications');
+const isVercel = process.env.VERCEL === '1' || process.env.VERCEL_ENV;
+const baseDir = isVercel ? '/tmp' : path.join(__dirname, '..');
+const uploadsDir = path.join(baseDir, 'uploads', 'verifications');
+
 if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch (err) {
+    console.error('Could not create uploads directory:', err.message);
+  }
 }
 
 // Configure multer for file uploads
