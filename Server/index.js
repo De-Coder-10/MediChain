@@ -50,17 +50,21 @@ app.get("/", (req, res) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 5000;
+  const server = app.listen(PORT, () => console.log(` Server running on port ${PORT}`));
 
-server.on('error', (err) => {
-  if (err && err.code === 'EADDRINUSE') {
-    console.error(`\nPort ${PORT} is already in use.`);
-    console.error('Close the other running server, or change PORT in Server/.env.');
-    console.error('Windows PowerShell quick fix:');
-    console.error(`  Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq ${PORT} } | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force }`);
-  } else {
-    console.error('Server error:', err);
-  }
-  process.exit(1);
-});
+  server.on('error', (err) => {
+    if (err && err.code === 'EADDRINUSE') {
+      console.error(`\nPort ${PORT} is already in use.`);
+      console.error('Close the other running server, or change PORT in Server/.env.');
+      console.error('Windows PowerShell quick fix:');
+      console.error(`  Get-NetTCPConnection -State Listen | Where-Object { $_.LocalPort -eq ${PORT} } | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force }`);
+    } else {
+      console.error('Server error:', err);
+    }
+    process.exit(1);
+  });
+}
+
+export default app;
